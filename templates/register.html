@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.auth-wrap { display: flex; min-height: calc(100vh - 64px); }
+.auth-left {
+  flex: 1; background: var(--ink); padding: 4rem;
+  display: flex; flex-direction: column; justify-content: center; color: white;
+}
+.auth-left h2 { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 1rem; }
+.auth-left p { color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 2rem; }
+.auth-perks { list-style: none; }
+.auth-perks li { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; color: rgba(255,255,255,0.75); font-size: 0.9rem; }
+.auth-right { flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 3rem; }
+.auth-form { width: 100%; max-width: 480px; }
+.auth-form h3 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
+.auth-form .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: #444; }
+.form-group input, .form-group select {
+  width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; background: white;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--ink); }
+.form-submit { width: 100%; background: var(--ink); color: white; border: none; padding: 0.9rem; border-radius: 8px; font-size: 1rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+.form-submit:hover { background: var(--accent); }
+.form-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted); }
+.form-footer a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.error-msg { background: #fff0ee; border: 1px solid #ffb8ad; color: #c0392b; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.875rem; margin-bottom: 1.2rem; }
+.file-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-left">
+    <h2>Join PlacePro<br>Today</h2>
+    <p>Register once and get access to all campus placement opportunities — no repeated form filling, no hassle.</p>
+    <ul class="auth-perks">
+      <li><span>📄</span> <span>Upload your resume once, apply anywhere</span></li>
+      <li><span>🏆</span> <span>Access Google, Amazon, Microsoft & more</span></li>
+      <li><span>📱</span> <span>Real-time application tracking dashboard</span></li>
+      <li><span>🆓</span> <span>Completely free for students</span></li>
+    </ul>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form">
+      <h3>Create Account</h3>
+      <p class="sub">Fill in your details to get started</p>
+      {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+      <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="Arjun Sharma" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Branch</label>
+            <select name="branch">
+              <option value="CS">Computer Science</option>
+              <option value="IT">Information Technology</option>
+              <option value="ECE">Electronics & Comm.</option>
+              <option value="EEE">Electrical & Electronics</option>
+              <option value="ME">Mechanical</option>
+              <option value="CE">Civil</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>CGPA</label>
+            <input type="number" name="cgpa" placeholder="8.5" step="0.1" min="0" max="10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>College Email</label>
+          <input type="email" name="email" placeholder="21cs001@college.edu" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Choose a strong password" required>
+        </div>
+        <div class="form-group">
+          <label>Resume (PDF)</label>
+          <input type="file" name="resume" accept=".pdf,.doc,.docx">
+          <div class="file-note">Upload your updated resume — PDF preferred, max 5MB</div>
+        </div>
+        <button type="submit" class="form-submit">Create Account →</button>
+      </form>
+      <div class="form-footer">Already registered? <a href="/login">Login here</a></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

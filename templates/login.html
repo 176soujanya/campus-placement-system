@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.auth-wrap {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+.auth-left {
+  flex: 1;
+  background: var(--ink);
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+.auth-left h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  margin-bottom: 1rem;
+}
+.auth-left p { color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 2rem; }
+.auth-perks { list-style: none; }
+.auth-perks li { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; color: rgba(255,255,255,0.75); font-size: 0.9rem; }
+.auth-perks li span:first-child { font-size: 1.1rem; }
+.auth-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 3rem;
+}
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+}
+.auth-form h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+.auth-form .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: #444; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+  background: white;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--ink);
+}
+.form-submit {
+  width: 100%;
+  background: var(--ink);
+  color: white;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+.form-submit:hover { background: var(--accent); }
+.form-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted); }
+.form-footer a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.error-msg {
+  background: #fff0ee;
+  border: 1px solid #ffb8ad;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1.2rem;
+}
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-left">
+    <h2>Welcome Back to<br>PlacePro</h2>
+    <p>Log in to explore job listings, track your applications, and take the next step in your career journey.</p>
+    <ul class="auth-perks">
+      <li><span>🏢</span> <span>10+ top companies hiring now</span></li>
+      <li><span>⚡</span> <span>One-click job applications</span></li>
+      <li><span>📊</span> <span>Track your application status live</span></li>
+      <li><span>🎯</span> <span>Packages up to ₹45 LPA</span></li>
+    </ul>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form">
+      <h3>Student Login</h3>
+      <p class="sub">Enter your credentials to continue</p>
+      {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+      <form method="POST">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="you@college.edu" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="form-submit">Login →</button>
+      </form>
+      <div class="form-footer">Don't have an account? <a href="/register">Register here</a></div>
+      <div class="form-footer" style="margin-top: 0.5rem;"><a href="/admin_login">Admin Login</a></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
