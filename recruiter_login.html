@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.login-wrap { min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.login-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; }
+.login-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.3rem; }
+.login-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
+.form-group input { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; outline: none; transition: border 0.15s; }
+.form-group input:focus { border-color: var(--ink); }
+.login-btn { width: 100%; background: var(--ink); color: white; padding: 0.8rem; border-radius: 10px; font-size: 0.95rem; font-weight: 700; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.login-btn:hover { background: var(--accent); }
+.error-box { background: #fdeee8; border: 1px solid #f5c6b0; border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.85rem; color: #c0392b; font-weight: 600; margin-bottom: 1.2rem; }
+.role-badge { display: inline-block; background: #e8f4fd; color: #1a6fb0; border: 1px solid #9ecfed; border-radius: 6px; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 700; margin-bottom: 1.5rem; }
+</style>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="role-badge">🏢 Company Recruiter Portal</div>
+    <div class="login-title">Recruiter Login</div>
+    <div class="login-sub">Sign in to manage your company's applications</div>
+    {% if error %}<div class="error-box">⚠ {{ error }}</div>{% endif %}
+    <form method="POST">
+      <div class="form-group">
+        <label>Recruiter Email</label>
+        <input type="email" name="email" placeholder="hr@company.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required>
+      </div>
+      <button type="submit" class="login-btn">Sign In →</button>
+    </form>
+    <p style="margin-top:1.5rem;text-align:center;font-size:0.8rem;color:var(--muted);">
+      Credentials are created by the Admin. Contact your placement cell.
+    </p>
+  </div>
+</div>
+{% endblock %}

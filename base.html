@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlacePro — Campus Placement Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f5f3ee;
+    --accent: #ff4d2e;
+    --accent2: #1a1a2e;
+    --muted: #8a8a9a;
+    --card: #ffffff;
+    --border: #e2e0d8;
+    --success: #00c896;
+    --gold: #f5a623;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  nav {
+    background: var(--ink);
+    padding: 0 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--accent);
+  }
+  .nav-brand {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: white;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  .nav-brand span { color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+  .nav-links a {
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .nav-links a:hover { color: white; }
+  .nav-btn {
+    background: var(--accent) !important;
+    color: white !important;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600 !important;
+  }
+  .nav-btn:hover { opacity: 0.9; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+  main { min-height: calc(100vh - 64px); }
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+  footer strong { color: var(--accent); }
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-tech { background: #e8f4fd; color: #1a6fb0; }
+  .badge-finance { background: #fef9e8; color: #b07a1a; }
+  .badge-consult { background: #edfbf5; color: #1a8c5a; }
+  .badge-startup { background: #fdeee8; color: #b03a1a; }
+  .badge-semi { background: #f0edfb; color: #5a1ab0; }
+  .badge-it { background: #e8f0fd; color: #1a3ab0; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">Place<span>Pro</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/jobs">Browse Jobs</a>
+    <a href="/stats">Statistics</a>
+    {% if session.get('student') %}
+      <a href="/student_dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    {% elif session.get('admin') %}
+      <a href="/admin_dashboard">Admin Panel</a>
+      <a href="/logout">Logout</a>
+    {% elif session.get('coordinator') %}
+      <a href="/coordinator_dashboard">Coordinator Panel</a>
+      <a href="/coordinator_logout">Logout</a>
+    {% elif session.get('recruiter') %}
+      <a href="/recruiter_dashboard">{{ session.get('recruiter_company_name','') }} Recruiter</a>
+      <a href="/recruiter_logout">Logout</a>
+    {% else %}
+      <a href="/login">Student Login</a>
+      <a href="/coordinator_login">Coordinator</a>
+      <a href="/recruiter_login">Recruiter</a>
+      <a href="/admin_login">Admin</a>
+      <a href="/register" class="nav-btn">Register</a>
+    {% endif %}
+  </div>
+</nav>
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer>
+  <div>© 2025 <strong>PlacePro</strong> — Bridging Talent & Opportunity. Built for campus recruitment excellence.</div>
+</footer>
+</body>
+</html>

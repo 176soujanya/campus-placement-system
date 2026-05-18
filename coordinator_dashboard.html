@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.ad-layout { display: flex; min-height: calc(100vh - 64px); }
+.ad-sidebar {
+  width: 230px; flex-shrink: 0;
+  background: #0f2027; color: white;
+  display: flex; flex-direction: column;
+  padding: 1.5rem 0;
+  position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
+}
+.ad-sidebar-brand { padding: 0 1.2rem 1.5rem; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; color: rgba(255,255,255,0.9); }
+.ad-sidebar-brand span { color: #00c896; }
+.ad-nav-item { display: flex; align-items: center; gap: 10px; padding: 0.65rem 1.2rem; font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.65); cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; transition: all 0.15s; border-left: 3px solid transparent; }
+.ad-nav-item:hover { color: white; background: rgba(255,255,255,0.07); }
+.ad-nav-item.active { color: white; border-left-color: #00c896; background: rgba(255,255,255,0.1); }
+.ad-nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ad-nav-section { padding: 0.5rem 1.2rem 0.3rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 0.5rem; }
+.ad-sidebar-bottom { margin-top: auto; padding: 1rem 1.2rem 0; border-top: 1px solid rgba(255,255,255,0.1); }
+.ad-logout { display: block; text-align: center; background: #00c896; color: white; padding: 0.6rem; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+.ad-main { flex: 1; padding: 2rem 2.5rem; background: #f7f6f2; overflow-x: hidden; }
+.ad-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.ad-topbar h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+.ad-topbar p { color: var(--muted); font-size: 0.875rem; margin-top: 2px; }
+.ad-alert { background: #edfbf5; border: 1px solid #a8e6cf; border-radius: 8px; padding: 0.75rem 1.2rem; font-size: 0.875rem; color: #1a8c5a; font-weight: 600; margin-bottom: 1.5rem; }
+.ad-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.ad-stat { background: white; border: 1px solid #e2e0d8; border-radius: 14px; padding: 1.3rem 1.5rem; position: relative; overflow: hidden; }
+.ad-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--stat-color, #0f2027); }
+.ad-stat .num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--ink); }
+.ad-stat .lbl { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-top: 0.2rem; }
+.stat-green { --stat-color: #00c896; }
+.stat-blue  { --stat-color: #1a6fb0; }
+.stat-gold  { --stat-color: #d4881a; }
+.stat-red   { --stat-color: #c0392b; }
+.ad-section { background: white; border: 1px solid #e2e0d8; border-radius: 14px; margin-bottom: 2rem; overflow: hidden; }
+.ad-section-head { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; border-bottom: 1px solid #e2e0d8; }
+.ad-section-head h2 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
+.ad-section-body { padding: 1.5rem; }
+.at { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.at th { background: #f5f3ee; color: var(--muted); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid #e2e0d8; }
+.at td { padding: 0.85rem 1rem; border-bottom: 1px solid #f0eeea; vertical-align: middle; }
+.at tr:last-child td { border-bottom: none; }
+.at tr:hover td { background: #faf9f6; }
+.at-name { font-weight: 600; color: var(--ink); }
+.at-muted { color: var(--muted); font-size: 0.8rem; }
+.at-pkg { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); }
+.sbadge { display: inline-flex; align-items: center; gap: 4px; padding: 0.22rem 0.65rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+.s-applied { background: #e8f4fd; color: #1a6fb0; }
+.s-shortlisted { background: #fef9e8; color: #b07a1a; }
+.s-selected { background: #edfbf5; color: #1a8c5a; }
+.s-rejected { background: #fdeee8; color: #b03a1a; }
+.btn-sm { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: opacity 0.15s; }
+.btn-green { background: #edfbf5; color: #1a8c5a; }
+.btn-red { background: #fdeee8; color: #c0392b; }
+.btn-blue { background: #e8f4fd; color: #1a6fb0; }
+.btn-primary { background: #0f2027; color: white; padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.875rem; font-weight: 700; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-primary:hover { background: #00c896; }
+.form-input { width: 100%; border: 1.5px solid #e2e0d8; border-radius: 8px; padding: 0.6rem 0.9rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; outline: none; }
+.form-input:focus { border-color: #0f2027; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-label { font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px; }
+.notif-card { background: white; border: 1px solid #e2e0d8; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.75rem; border-left: 4px solid #00c896; }
+.notif-title { font-weight: 700; font-size: 0.9rem; }
+.notif-msg { color: var(--muted); font-size: 0.82rem; margin-top: 0.2rem; }
+.notif-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+.notif-info { border-left-color: #1a6fb0; }
+.notif-warning { border-left-color: #d4881a; }
+.notif-success { border-left-color: #00c896; }
+.notif-urgent { border-left-color: #c0392b; }
+.panel { display: none; }
+.panel.active { display: block; }
+.verified-chip { display:inline-block;background:#edfbf5;color:#1a8c5a;padding:0.15rem 0.6rem;border-radius:12px;font-size:0.7rem;font-weight:700; }
+.unverified-chip { display:inline-block;background:#fdeee8;color:#c0392b;padding:0.15rem 0.6rem;border-radius:12px;font-size:0.7rem;font-weight:700; }
+</style>
+
+<div class="ad-layout">
+  <!-- Sidebar -->
+  <aside class="ad-sidebar">
+    <div class="ad-sidebar-brand">Place<span>Pro</span><br><small style="font-weight:400;font-size:0.72rem;color:rgba(255,255,255,0.5);">Coordinator Panel</small></div>
+
+    <div class="ad-nav-section">Menu</div>
+    <button class="ad-nav-item" onclick="switchPanel('overview', this)" id="nav-overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+    <button class="ad-nav-item" onclick="switchPanel('students', this)" id="nav-students">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Students & Eligibility
+    </button>
+    <button class="ad-nav-item" onclick="switchPanel('companies', this)" id="nav-companies">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Register Companies
+    </button>
+    <button class="ad-nav-item" onclick="switchPanel('applications', this)" id="nav-applications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Applications
+    </button>
+    <button class="ad-nav-item" onclick="switchPanel('notifications', this)" id="nav-notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Send Notifications
+    </button>
+
+    <div class="ad-sidebar-bottom">
+      <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:0.5rem;">{{ session.coordinator_name }}</div>
+      <a href="/coordinator_logout" class="ad-logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="ad-main">
+    {% if msg %}<div class="ad-alert">✅ {{ msg }}</div>{% endif %}
+
+    <!-- OVERVIEW -->
+    <div id="panel-overview" class="panel">
+      <div class="ad-topbar">
+        <div>
+          <h1>Welcome, {{ session.coordinator_name }} 👋</h1>
+          <p>College Placement Coordinator Dashboard</p>
+        </div>
+      </div>
+      <div class="ad-stats">
+        <div class="ad-stat stat-blue">
+          <div class="num">{{ total_students }}</div>
+          <div class="lbl">Students</div>
+        </div>
+        <div class="ad-stat stat-green">
+          <div class="num">{{ total_companies }}</div>
+          <div class="lbl">Companies</div>
+        </div>
+        <div class="ad-stat stat-gold">
+          <div class="num">{{ total_apps }}</div>
+          <div class="lbl">Applications</div>
+        </div>
+        <div class="ad-stat stat-green">
+          <div class="num">{{ placed_count }}</div>
+          <div class="lbl">Placed</div>
+        </div>
+      </div>
+      <div class="ad-section">
+        <div class="ad-section-head"><h2>📋 Recent Applications</h2></div>
+        <table class="at">
+          <thead><tr><th>Student</th><th>Branch / CGPA</th><th>Company</th><th>Applied On</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for a in apps[:10] %}
+            <tr>
+              <td class="at-name">{{ a.name }}</td>
+              <td class="at-muted">{{ a.branch }} · {{ a.cgpa }}</td>
+              <td class="at-name">{{ a.company }}</td>
+              <td class="at-muted">{{ a.applied_on[:10] if a.applied_on else '—' }}</td>
+              <td><span class="sbadge s-{{ a.status|lower }}">{{ a.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STUDENTS & ELIGIBILITY -->
+    <div id="panel-students" class="panel">
+      <div class="ad-topbar"><div><h1>Students & Eligibility</h1><p>Verify students and manage placement eligibility</p></div></div>
+      <div class="ad-section">
+        <div class="ad-section-head"><h2>👨‍🎓 All Students ({{ students|length }})</h2></div>
+        <table class="at">
+          <thead><tr><th>Name</th><th>Branch / CGPA</th><th>Phone</th><th>Applications</th><th>Verified</th><th>Eligible</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for s in students %}
+            <tr>
+              <td>
+                <div class="at-name">{{ s.name }}</div>
+                <div class="at-muted">{{ s.email }}</div>
+              </td>
+              <td class="at-muted">{{ s.branch or '—' }} · {{ s.cgpa or '—' }}</td>
+              <td class="at-muted">{{ s.phone or '—' }}</td>
+              <td style="text-align:center;">{{ s.app_count or 0 }}</td>
+              <td>
+                {% if s.verified %}<span class="verified-chip">✓ Verified</span>
+                {% else %}<span class="unverified-chip">Pending</span>{% endif %}
+              </td>
+              <td>
+                {% if s.eligible %}<span class="sbadge s-selected">Eligible</span>
+                {% else %}<span class="sbadge s-rejected">Ineligible</span>{% endif %}
+              </td>
+              <td style="display:flex;gap:4px;flex-wrap:wrap;">
+                {% if not s.verified %}
+                <a href="/coordinator/verify_student/{{ s.id }}" class="btn-sm btn-green">✓ Verify</a>
+                {% endif %}
+                {% if s.eligible %}
+                <a href="/coordinator/set_eligible/{{ s.id }}/0" class="btn-sm btn-red">Mark Ineligible</a>
+                {% else %}
+                <a href="/coordinator/set_eligible/{{ s.id }}/1" class="btn-sm btn-green">Mark Eligible</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REGISTER COMPANIES -->
+    <div id="panel-companies" class="panel">
+      <div class="ad-topbar"><div><h1>Register Companies</h1><p>Add new companies to the placement drive</p></div></div>
+      <div class="ad-section" style="margin-bottom:2rem;">
+        <div class="ad-section-head"><h2>➕ Register New Company</h2></div>
+        <div class="ad-section-body">
+          <form method="POST" action="/coordinator/add_company">
+            <div class="form-grid-2" style="margin-bottom:1rem;">
+              <div><label class="form-label">Company Name *</label><input class="form-input" name="name" required placeholder="Google, Amazon..."></div>
+              <div><label class="form-label">Role / Position *</label><input class="form-input" name="role" required placeholder="Software Engineer, Data Analyst..."></div>
+              <div><label class="form-label">Package (LPA) *</label><input class="form-input" name="package" required placeholder="12 LPA, 25 LPA..."></div>
+              <div><label class="form-label">Location</label><input class="form-input" name="location" placeholder="Bangalore, Hyderabad..."></div>
+              <div><label class="form-label">Domain</label>
+                <select name="domain" class="form-input">
+                  <option>Technology</option><option>Finance</option><option>Consulting</option>
+                  <option>IT Services</option><option>Startup</option><option>Semiconductor</option><option>Other</option>
+                </select></div>
+              <div><label class="form-label">Job Type</label>
+                <select name="type" class="form-input">
+                  <option>Full-Time</option><option>Internship</option><option>Contract</option>
+                </select></div>
+              <div><label class="form-label">Min CGPA Required</label><input class="form-input" name="min_cgpa" type="number" step="0.1" placeholder="6.5" value="6.0"></div>
+              <div><label class="form-label">Eligible Branches (comma separated)</label><input class="form-input" name="branches" placeholder="CS,IT,ECE or All"></div>
+              <div><label class="form-label">Application Deadline</label><input class="form-input" name="deadline" placeholder="30 Jun 2025"></div>
+            </div>
+            <div style="margin-bottom:1rem;">
+              <label class="form-label">Job Description</label>
+              <textarea name="description" class="form-input" rows="3" placeholder="Describe the company and role..."></textarea>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+              <label class="form-label">Requirements</label>
+              <textarea name="requirements" class="form-input" rows="2" placeholder="CGPA, skills, branch requirements..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Register Company →</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="ad-section">
+        <div class="ad-section-head"><h2>🏢 Registered Companies ({{ companies|length }})</h2></div>
+        <table class="at">
+          <thead><tr><th>Company</th><th>Role</th><th>Package</th><th>Domain</th><th>Deadline</th><th>Min CGPA</th></tr></thead>
+          <tbody>
+            {% for c in companies %}
+            <tr>
+              <td class="at-name">{{ c.name }}</td>
+              <td class="at-muted">{{ c.role }}</td>
+              <td class="at-pkg">₹{{ c.package }}</td>
+              <td><span class="sbadge s-applied">{{ c.domain }}</span></td>
+              <td class="at-muted">{{ c.deadline or '—' }}</td>
+              <td>{{ c.min_cgpa or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div id="panel-applications" class="panel">
+      <div class="ad-topbar"><div><h1>All Applications</h1><p>View student applications across all companies</p></div></div>
+      <div class="ad-section">
+        <table class="at">
+          <thead><tr><th>Student</th><th>Branch / CGPA</th><th>Phone</th><th>Company</th><th>Applied On</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for a in apps %}
+            <tr>
+              <td>
+                <div class="at-name">{{ a.name }}</div>
+                <div class="at-muted">{{ a.email }}</div>
+              </td>
+              <td class="at-muted">{{ a.branch }} · {{ a.cgpa }}</td>
+              <td class="at-muted">{{ a.phone or '—' }}</td>
+              <td class="at-name">{{ a.company }}</td>
+              <td class="at-muted">{{ a.applied_on[:10] if a.applied_on else '—' }}</td>
+              <td><span class="sbadge s-{{ a.status|lower }}">{{ a.status }}</span></td>
+            </tr>
+            {% endfor %}
+            {% if not apps %}<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem;">No applications yet.</td></tr>{% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div id="panel-notifications" class="panel">
+      <div class="ad-topbar"><div><h1>Send Notifications</h1><p>Notify students about drives, deadlines, and updates</p></div></div>
+
+      <div class="ad-section" style="margin-bottom:2rem;">
+        <div class="ad-section-head"><h2>📢 Send New Notification</h2></div>
+        <div class="ad-section-body">
+          <form method="POST" action="/coordinator/send_notification">
+            <div class="form-grid-2" style="margin-bottom:1rem;">
+              <div><label class="form-label">Title *</label><input class="form-input" name="title" required placeholder="Campus Drive — Google 2025"></div>
+              <div><label class="form-label">Type</label>
+                <select name="type" class="form-input">
+                  <option value="info">ℹ Info</option>
+                  <option value="success">✅ Good News</option>
+                  <option value="warning">⚠ Warning</option>
+                  <option value="urgent">🔴 Urgent</option>
+                </select>
+              </div>
+              <div><label class="form-label">Send To</label>
+                <select name="target" class="form-input" id="notif-target" onchange="toggleTargetValue(this)">
+                  <option value="all">All Students</option>
+                  <option value="branch">Specific Branch</option>
+                  <option value="student">Specific Student (email)</option>
+                </select>
+              </div>
+              <div id="target-value-wrap" style="display:none;">
+                <label class="form-label">Branch / Student Email</label>
+                <input class="form-input" name="target_value" id="target-value" placeholder="CS or student@email.com">
+              </div>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+              <label class="form-label">Message *</label>
+              <textarea name="message" required class="form-input" rows="4" placeholder="Write your notification message here..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary">📤 Send Notification</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="ad-section">
+        <div class="ad-section-head"><h2>📬 Sent Notifications ({{ notifications|length }})</h2></div>
+        <div class="ad-section-body">
+          {% for n in notifications %}
+          <div class="notif-card notif-{{ n.type }}">
+            <div class="notif-title">{{ n.title }}</div>
+            <div class="notif-msg">{{ n.message }}</div>
+            <div class="notif-meta">
+              Sent by <strong>{{ n.sent_by }}</strong> · 
+              To: <strong>{% if n.target == 'all' %}All Students{% elif n.target == 'branch' %}Branch: {{ n.target_value }}{% else %}{{ n.target_value }}{% endif %}</strong> · 
+              {{ n.sent_on[:16] if n.sent_on else '—' }}
+            </div>
+          </div>
+          {% else %}
+          <p style="color:var(--muted);text-align:center;padding:2rem;">No notifications sent yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const PANELS = ['overview','students','companies','applications','notifications'];
+function switchPanel(name, btn) {
+  PANELS.forEach(p => {
+    document.getElementById('panel-' + p).classList.remove('active');
+    const nb = document.getElementById('nav-' + p);
+    if (nb) nb.classList.remove('active');
+  });
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const url = new URL(window.location);
+  url.searchParams.set('tab', name);
+  history.replaceState({}, '', url);
+}
+function toggleTargetValue(sel) {
+  const wrap = document.getElementById('target-value-wrap');
+  wrap.style.display = sel.value === 'all' ? 'none' : 'block';
+  document.getElementById('target-value').placeholder = sel.value === 'branch' ? 'e.g. CS, ECE' : 'student@email.com';
+}
+(function() {
+  const tab = new URLSearchParams(window.location.search).get('tab') || 'overview';
+  switchPanel(tab, document.getElementById('nav-' + tab));
+})();
+</script>
+{% endblock %}

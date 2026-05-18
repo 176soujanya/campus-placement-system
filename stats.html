@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.stats-wrap { max-width: 1000px; margin: 3rem auto; padding: 0 2rem; }
+.stats-header { margin-bottom: 3rem; }
+.stats-header h1 { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; letter-spacing: -1.5px; }
+.stats-header p { color: var(--muted); margin-top: 0.4rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+.stat-block {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.stat-block:hover { transform: translateY(-3px); }
+.stat-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; letter-spacing: -2px; }
+.stat-lbl { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.domain-section h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem; margin-bottom: 1.2rem; }
+.domain-row {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 0.75rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+.domain-name { width: 120px; font-weight: 600; font-size: 0.9rem; }
+.domain-bar-wrap { flex: 1; height: 8px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.domain-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
+.domain-cnt { font-family: 'Syne', sans-serif; font-weight: 700; width: 30px; text-align: right; font-size: 0.9rem; }
+.highlight-bar {
+  background: var(--ink);
+  color: white;
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  text-align: center;
+}
+.hl-val { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; }
+.hl-val span { color: var(--accent); }
+.hl-lbl { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
+
+<div class="stats-wrap">
+  <div class="stats-header">
+    <h1>Placement Statistics</h1>
+    <p>Live overview of PlacePro campus recruitment activity</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-block">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-val">{{ students }}</div>
+      <div class="stat-lbl">Registered Students</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-icon">🏢</div>
+      <div class="stat-val">{{ companies }}</div>
+      <div class="stat-lbl">Companies Hiring</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-icon">📨</div>
+      <div class="stat-val">{{ applications }}</div>
+      <div class="stat-lbl">Total Applications</div>
+    </div>
+  </div>
+
+  <div class="highlight-bar">
+    <div>
+      <div class="hl-val"><span>₹45</span> LPA</div>
+      <div class="hl-lbl">Highest Package</div>
+    </div>
+    <div>
+      <div class="hl-val"><span>₹22</span> LPA</div>
+      <div class="hl-lbl">Avg. Top-10 Package</div>
+    </div>
+    <div>
+      <div class="hl-val">6</div>
+      <div class="hl-lbl">Domains Covered</div>
+    </div>
+    <div>
+      <div class="hl-val">Pan<span> India</span></div>
+      <div class="hl-lbl">Job Locations</div>
+    </div>
+  </div>
+
+  <div class="domain-section">
+    <h2>Openings by Domain</h2>
+    {% set max_cnt = domain_stats | map(attribute='cnt') | max %}
+    {% for d in domain_stats %}
+    <div class="domain-row">
+      <div class="domain-name">{{ d.domain }}</div>
+      <div class="domain-bar-wrap">
+        <div class="domain-bar" style="width: {{ (d.cnt / max_cnt * 100)|int }}%"></div>
+      </div>
+      <div class="domain-cnt">{{ d.cnt }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
